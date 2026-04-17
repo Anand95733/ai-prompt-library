@@ -156,14 +156,27 @@ def prompt_detail(request, pk):
         try:
             prompt = Prompt.objects.get(pk=pk)
             
-            # Increment view count in Redis (graceful fallback)
-            view_count = 0
+            # Increment view count using Redis (primary) with PostgreSQL fallback
+            # Redis provides fast, atomic counters for high-traffic scenarios
             if redis_client:
                 try:
                     view_key = f'prompt:{pk}:views'
                     view_count = redis_client.incr(view_key)
+                    # Sync to database periodically for persistence
+                    prompt.view_count = view_count
+                    prompt.save(update_fields=['view_count'])
                 except Exception:
-                    view_count = 0
+                    # Redis failed mid-request — fall back to database
+                    from django.db.models import F
+                    Prompt.objects.filter(pk=pk).update(view_count=F('view_count') + 1)
+                    prompt.refresh_from_db()
+                    view_count = prompt.view_count
+            else:
+                # No Redis available — use database directly
+                from django.db.models import F
+                Prompt.objects.filter(pk=pk).update(view_count=F('view_count') + 1)
+                prompt.refresh_from_db()
+                view_count = prompt.view_count
             
             return JsonResponse({
                 'id': prompt.id,
