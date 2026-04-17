@@ -7,12 +7,16 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 from drf_spectacular.types import OpenApiTypes
 from .models import Prompt
 
-# Initialize Redis connection
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    decode_responses=True
-)
+# Initialize Redis connection (optional — graceful fallback if unavailable)
+try:
+    redis_client = redis.Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        decode_responses=True
+    )
+    redis_client.ping()
+except Exception:
+    redis_client = None
 
 
 @extend_schema(
@@ -152,9 +156,14 @@ def prompt_detail(request, pk):
         try:
             prompt = Prompt.objects.get(pk=pk)
             
-            # Increment view count in Redis
-            view_key = f'prompt:{pk}:views'
-            view_count = redis_client.incr(view_key)
+            # Increment view count in Redis (graceful fallback)
+            view_count = 0
+            if redis_client:
+                try:
+                    view_key = f'prompt:{pk}:views'
+                    view_count = redis_client.incr(view_key)
+                except Exception:
+                    view_count = 0
             
             return JsonResponse({
                 'id': prompt.id,
