@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://YOUR-APP.onrender.com/$1"
+      "destination": "https://ai-prompt-library-api-5t85.onrender.com/$1"
     },
     {
       "source": "/(.*)",
