@@ -1,0 +1,60 @@
+<div class="container">
+  <div class="back-link">
+    <a routerLink="/prompts">← Back to prompts</a>
+  </div>
+
+  <div class="form-card">
+    <h2 class="form-title">Create New Prompt</h2>
+    <p class="form-subtitle">Share your AI prompt with the community</p>
+
+    <form [formGroup]="promptForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="Enter a descriptive title"
+          [class.error]="getFieldError('title')"
+        />
+        <span *ngIf="getFieldError('title')" class="error-message">
+          {{ getFieldError('title') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="content">Prompt Content</label>
+        <textarea
+          id="content"
+          formControlName="content"
+          rows="8"
+          placeholder="Enter your prompt content (minimum 20 characters)"
+          [class.error]="getFieldError('content')"
+        ></textarea>
+        <span *ngIf="getFieldError('content')" class="error-message">
+          {{ getFieldError('content') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="complexity">Complexity (1-10)</label>
+        <input
+          id="complexity"
+          type="number"
+          formControlName="complexity"
+          min="1"
+          max="10"
+          [class.error]="getFieldError('complexity')"
+        />
+        <span class="help-text">Rate the complexity: 1 (simple) to 10 (advanced)</span>
+        <span *ngIf="getFieldError('complexity')" class="error-message">
+          {{ getFieldError('complexity') }}
+        </span>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="submitting">
+        {{ submitting ? 'Creating...' : 'Create Prompt' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="back-link">
+    <a routerLink="/prompts">← Back to prompts</a>
+  </div>
+
+  <div *ngIf="loading" class="detail-skeleton">
+    <div class="skeleton-title"></div>
+    <div class="skeleton-meta"></div>
+    <div class="skeleton-content"></div>
+  </div>
+
+  <div *ngIf="!loading && prompt" class="detail-card">
+    <div class="detail-header">
+      <h1 class="detail-title">{{ prompt.title }}</h1>
+      <span [class]="'complexity-badge ' + getComplexityClass(prompt.complexity)">
+        Complexity: {{ prompt.complexity }}
+      </span>
+    </div>
+
+    <div class="detail-meta">
+      <span class="meta-item">📅 {{ prompt.created_at | date:'MMMM d, y' }}</span>
+      <span class="meta-item">👁 {{ prompt.view_count }} {{ prompt.view_count === 1 ? 'view' : 'views' }}</span>
+    </div>
+
+    <div class="detail-content">
+      <h3>Prompt Content</h3>
+      <p class="content-text">{{ prompt.content }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !prompt" class="error-state">
+    <h2>Prompt not found</h2>
+    <a routerLink="/prompts" class="btn-primary">Back to Library</a>
+  </div>
+</div>

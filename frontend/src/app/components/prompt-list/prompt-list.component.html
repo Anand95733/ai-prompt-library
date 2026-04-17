@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="header-section">
+    <h2 class="page-title">Discover AI Prompts</h2>
+    <p class="page-subtitle">Curated collection of powerful prompts for your AI workflows</p>
+  </div>
+
+  <div *ngIf="loading" class="grid">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+  </div>
+
+  <div *ngIf="!loading && prompts.length === 0" class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>No prompts yet</h3>
+    <p>Be the first to add a prompt to the library</p>
+    <a routerLink="/add-prompt" class="btn-primary">Create First Prompt</a>
+  </div>
+
+  <div *ngIf="!loading && prompts.length > 0" class="grid">
+    <a *ngFor="let prompt of prompts" [routerLink]="['/prompts', prompt.id]" class="card">
+      <div class="card-header">
+        <h3 class="card-title">{{ prompt.title }}</h3>
+        <span [class]="'complexity-badge ' + getComplexityClass(prompt.complexity)">
+          {{ prompt.complexity }}
+        </span>
+      </div>
+      <div class="card-footer">
+        <span class="date">{{ prompt.created_at | date:'MMM d, y' }}</span>
+      </div>
+    </a>
+  </div>
+</div>
